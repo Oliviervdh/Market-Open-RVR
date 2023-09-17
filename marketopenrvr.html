@@ -7,207 +7,174 @@
     <title>Document</title>
 </head>
 <body>
+
+    //@version=5
+    indicator(title="Market Open RVR", shorttitle="Market Open RVR", overlay=true, format=format.volume)
+     
+    i_length = input.int(defval=14, title=" Volume Days", minval=1, maxval=200)
+     
+     
+    f_add_to_array(_arr, _val) => // _arr = id / _val = value
+        len = array.size(_arr) // Len = lenght of array
+     
+        if (len == i_length)    // We hit the lookback period (Lenght of array equals the input value of avg volume)
+            array.pop(_arr)     // Remove the last element 
+            array.unshift(_arr, _val)   // Insert to first position
+        else    
+            array.unshift(_arr, _val) // Still days to go
+     
+    is_session_end = false
     
-//@version=5
-indicator(title="Market Open RVR", shorttitle="Market Open RVR", overlay=true, format=format.volume)
- 
-i_length = input.int(defval=14, title=" Volume Days", minval=1, maxval=200)
- 
- 
-f_add_to_array(_arr, _val) => // _arr = id / _val = value
-    len = array.size(_arr) // Len = lenght of array
- 
-    if (len == i_length)    // We hit the lookback period (Lenght of array equals the input value of avg volume)
-        array.pop(_arr)     // Remove the last element 
-        array.unshift(_arr, _val)   // Insert to first position
-    else    
-        array.unshift(_arr, _val) // Still days to go
- 
-is_session_end = false
-
-// Find if it is a new "market" session
-is_new_sesion = ta.change(time("1D")) 
-is_session = time(timeframe.period, "0400-1931")  
-is_market_sesion = time(timeframe.period, "0930-0931")
-isToday = year(timenow) == year(time) and month(timenow) == month(time) and dayofmonth(timenow) == dayofmonth(time)
-
-// Highlights every first candle of each new "market" session 
-//bgcolor(is_market_sesion ? color.new(color.yellow, 50) : na) 
-
-// Check if pre market 
-is_market_preMarket = time(timeframe.period, "0400-0401")
-// Highlights every first candle of each new "market" session 
-// bgcolor(is_market_preMarket ? color.new(color.yellow, 50) : na) 
-
-// Checks if session is ended
-if(dayofmonth(timenow) and hour(time) > 18 and minute(time) > 30)   
-    is_session_end := true
-
-
-// Arrays for total volume
-var vol_arr_1 = array.new_float(i_length, 0)
-var vol_arr_5 = array.new_float(i_length, 0)
-var vol_arr_10 = array.new_float(i_length, 0)
-var vol_arr_30 = array.new_float(i_length, 0)
-var vol_arr_45 = array.new_float(i_length, 0)
-var vol_arr_akt = array.new_float(i_length, 0)
-var vol_arr_ses = array.new_float(i_length, 0)
-
-
-
-
-// Variables for bar cnt
-var int bar_cnt = 0
-var int total_bars_cnt = 0
-var int pm_bars_cnt = 0
-
-// Variables for volume
-var float vol_1 = 0
-var float vol_5 = 0
-var float vol_10 = 0
-var float vol_30 = 0
-var float vol_45 = 0
-var float vol_akt = 0
-var float vol_pm = 0
-var float vol_ses = 0 
-
-
-if (isToday)
-    vol_pm := is_new_sesion ? volume : session.ispremarket ? vol_pm + volume : vol_pm
-
- 
-// If it's a new session, start over
-// If we have some bars to go, add the volume to current count
-// If we are beyond the target number of bars, keep the last value
-vol_1 := is_market_sesion ? volume : (bar_cnt < 0) ? vol_1 + volume : vol_1
-vol_5 := is_market_sesion ? volume : (bar_cnt < 4) ? vol_5 + volume : vol_5
-vol_10 := is_market_sesion ? volume : (bar_cnt < 9) ? vol_10 + volume : vol_10
-vol_30 := is_market_sesion ? volume : (bar_cnt < 29) ? vol_30 + volume : vol_30
-vol_45 := is_market_sesion ? volume : (bar_cnt < 44) ? vol_45 + volume : vol_45
-vol_akt := is_market_sesion ? volume : (bar_cnt < total_bars_cnt) ? vol_akt + volume : session.ismarket ? vol_akt + volume : barstate.isrealtime ? vol_akt + volume : vol_akt
-vol_ses := is_new_sesion ? volume : is_session ? vol_ses + volume : vol_ses
-
-// vol_akt := is_market_sesion ? volume : (bar_cnt == total_bars_cnt) ? vol_akt + volume : vol_akt
-
-
-
-// When time < 0930 Show empty table value's
-// Only counts on current day how many candles have been printed and add couter +1 to >>>>>>> "total_bars_cnt" <<<<<<<  
-startDate = input.int(title="Start Date", defval = 13, minval = 1, maxval = 31)
-startMonth = input.int(title="Start Month", defval = 1, minval = 1, maxval = 12)
-startYear = input.int(title="Start Year", defval = 2002, minval = 1800, maxval = 2100)
-
-endDate = input.int(title="End Date", defval = 14, minval = 1, maxval = 31)
-endMonth = input.int(title="End Month", defval = 1, minval = 1, maxval = 12)
-endYear = input.int(title="End Year", defval = 2002, minval = 1800, maxval = 2100)
-
-inDateRange = (time >= timestamp(syminfo.timezone, startYear, startMonth, startDate, 0, 0)) and (time < timestamp(syminfo.timezone, endYear, endMonth, endDate, 0, 0))
-
-showClose = if(inDateRange)
-    // total_bars_cnt := is_market_sesion ? 0 : session.ismarket ? total_bars_cnt + 1 : total_bars_cnt 
-    total_bars_cnt := is_market_sesion ? 0 : session.ismarket ? total_bars_cnt + 1 : barstate.isrealtime ? total_bars_cnt + 1 : total_bars_cnt // >> only check for current session >> date <<<
-//plot(showClose, linewidth = 3)
-// plot(total_bars_cnt)
-
-// Counter for each bar after session open
-bar_cnt := is_market_sesion ? 0 : session.ismarket ? bar_cnt + 1 : bar_cnt
- 
- 
-// add to array if condition = true
-if (bar_cnt == 0)
-    f_add_to_array(vol_arr_1, vol_1)
-if (bar_cnt == 4)
-    f_add_to_array(vol_arr_5, vol_5)
-if (bar_cnt == 9)
-    f_add_to_array(vol_arr_10, vol_10)
-if (bar_cnt == 29)
-    f_add_to_array(vol_arr_30, vol_30)
-if (bar_cnt == 44)
-    f_add_to_array(vol_arr_45, vol_45)
-if (total_bars_cnt == bar_cnt)
-    f_add_to_array(vol_arr_akt, vol_akt)
-if(is_session_end == true)    
-    f_add_to_array(vol_arr_ses, vol_ses)
-
-
-
-total_volume_1 = array.sum(vol_arr_1)
-avg_volume_1 = array.avg(vol_arr_1)
-
-total_volume_5 = array.sum(vol_arr_5)
-avg_volume_5 = array.avg(vol_arr_5)
-
-total_volume_10 = array.sum(vol_arr_10)
-avg_volume_10 = array.avg(vol_arr_10)
-
-total_volume_30 = array.sum(vol_arr_30)
-avg_volume_30 = array.avg(vol_arr_30)
-
-total_volume_45 = array.sum(vol_arr_45)
-avg_volume_45 = array.avg(vol_arr_45)
-
-total_volume_akt = array.sum(vol_arr_akt)
-avg_volume_akt = array.avg(vol_arr_akt)
-
-avg_volume_ses = array.avg(vol_arr_ses)
-
- 
-var string GP2 = "Table Style"
-i_tbl_bg_color = input.color(defval=color.rgb(149, 152, 161, 0), title="  Table Background Color", group=GP2) //  rgb(149,152,161) 
-i_tbl_border_color = input.color(defval=color.rgb(30, 39, 46, 0), title="  Table Border Color", group=GP2) // Black Pearl= rgb(30, 39, 46)
-i_tbl_text_color = input.color(defval=color.rgb(241, 242, 246, 0), title="  Table Text Color", group=GP2) // Anti-Flash White = rgb(241, 242, 246)
-i_tbl_frame_width = input.int(defval=2, title="  Table Frame Width", minval=1, maxval=20, group=GP2)
-i_tbl_border_width = input.int(defval=1, title="  Table Border Width", minval=1, maxval=20, group=GP2)
- 
-string  i_tableYpos = input.string(defval="top", title=" Table Position", inline="11", options=["top", "middle", "bottom"], group=GP2)
-string  i_tableXpos = input.string(defval="center", title="", inline="11", options=["left", "center", "right"], group=GP2)
- 
- 
-// Display table only on last bar to reduce computation time
-if barstate.islast
- 
-    // Only Display table on daily chart or a lower timeframe
-    if timeframe.isminutes and timeframe.multiplier < 31
-        // Create a table with 3 columns and 2 rows
-        var table volTable = table.new(i_tableYpos + "_" + i_tableXpos, 6, 7, bgcolor = i_tbl_bg_color, frame_width = i_tbl_frame_width, frame_color = i_tbl_border_color, border_width = i_tbl_border_width, border_color = i_tbl_border_color)
-        // Populate cells in table
- 
-        // Column 1
-        table.cell(volTable, 0, 0, "V%: " + str.tostring(math.round(vol_pm / avg_volume_ses * 100)) + "%", text_halign=text.align_left)
-        table.cell(volTable, 0, 1, text="V. (AVG)", text_halign=text.align_left)
-        table.cell(volTable, 0, 2, text="V. (Today)", text_halign=text.align_left)
-        table.cell(volTable, 0, 3, text="V. (Today %)", text_halign=text.align_left)
-        // Column 1
-        table.cell(volTable, 1, 0, text="1m")
-        table.cell(volTable, 1, 1, str.tostring(avg_volume_1, format.volume))
-        table.cell(volTable, 1, 2, str.tostring(vol_1, format.volume))
-        table.cell(volTable, 1, 3, str.tostring(math.round(vol_1 / avg_volume_1 * 100,0)) + "%")
-        //
-        table.cell(volTable, 2, 0, text="5m")
-        table.cell(volTable, 2, 1, str.tostring(avg_volume_5, format.volume))
-        table.cell(volTable, 2, 2, str.tostring(vol_5, format.volume))
-        table.cell(volTable, 2, 3, str.tostring(math.round(vol_5 / avg_volume_5 * 100,0)) + "%")
-        //
-        table.cell(volTable, 3, 0, text="10m")
-        table.cell(volTable, 3, 1, str.tostring(avg_volume_10, format.volume))
-        table.cell(volTable, 3, 2, str.tostring(vol_10, format.volume))
-        table.cell(volTable, 3, 3, str.tostring(math.round(vol_10 / avg_volume_10 * 100,0)) + "%")
-        //
-        table.cell(volTable, 4, 0, text="30m")
-        table.cell(volTable, 4, 1, str.tostring(avg_volume_30, format.volume))
-        table.cell(volTable, 4, 2, str.tostring(vol_30, format.volume))
-        table.cell(volTable, 4, 3, str.tostring(math.round(vol_30 / avg_volume_30 * 100,0)) + "%")
-         //
-        table.cell(volTable, 5, 0, text="45m")
-        table.cell(volTable, 5, 1, str.tostring(avg_volume_45, format.volume))
-        table.cell(volTable, 5, 2, str.tostring(vol_45, format.volume))
-        table.cell(volTable, 5, 3, str.tostring(math.round(vol_45 / avg_volume_45 * 100,0)) + "%")
-
-
-        // table.cell(volTable, 4, 0, text="Akt.")
-        // table.cell(volTable, 4, 1, str.tostring(avg_volume_akt, format.volume))
-        // table.cell(volTable, 4, 2, str.tostring(vol_akt, format.volume))
-        // table.cell(volTable, 4, 3, str.tostring(math.round(vol_akt / avg_volume_akt * 100,0)) + "%")
+    // Find if it is a new "market" session
+    is_new_sesion = ta.change(time("1D")) 
+    is_session = time(timeframe.period, "0400-1931")  
+    is_market_sesion = time(timeframe.period, "0930-0931")
+    isToday = year(timenow) == year(time) and month(timenow) == month(time) and dayofmonth(timenow) == dayofmonth(time)
+    
+    // Highlights every first candle of each new "market" session 
+    //bgcolor(is_market_sesion ? color.new(color.yellow, 50) : na) 
+    
+    // Check if pre market 
+    is_market_preMarket = time(timeframe.period, "0400-0401")
+    // Highlights every first candle of each new "market" session 
+    // bgcolor(is_market_preMarket ? color.new(color.yellow, 50) : na) 
+    
+    // Checks if session is ended
+    if(dayofmonth(timenow) and hour(time) > 18 and minute(time) > 30)   
+        is_session_end := true
+    
+    
+    // Arrays for total volume
+    var vol_arr_1 = array.new_float(i_length, 0)
+    var vol_arr_5 = array.new_float(i_length, 0)
+    var vol_arr_10 = array.new_float(i_length, 0)
+    var vol_arr_30 = array.new_float(i_length, 0)
+    var vol_arr_45 = array.new_float(i_length, 0)
+    var vol_arr_ses = array.new_float(i_length, 0)
+    
+    
+    
+    
+    // Variables for bar cnt
+    var int bar_cnt = 0
+    var int total_bars_cnt = 0
+    var int pm_bars_cnt = 0
+    
+    // Variables for volume
+    var float vol_1 = 0
+    var float vol_5 = 0
+    var float vol_10 = 0
+    var float vol_30 = 0
+    var float vol_45 = 0
+    var float vol_pm = 0
+    var float vol_ses = 0 
+    
+    
+    if (isToday)
+        vol_pm := is_new_sesion ? volume : session.ispremarket ? vol_pm + volume : vol_pm
+    
+     
+    // If it's a new session, start over
+    // If we have some bars to go, add the volume to current count
+    // If we are beyond the target number of bars, keep the last value
+    vol_1 := is_market_sesion ? volume : (bar_cnt < 0) ? vol_1 + volume : vol_1
+    vol_5 := is_market_sesion ? volume : (bar_cnt < 4) ? vol_5 + volume : vol_5
+    vol_10 := is_market_sesion ? volume : (bar_cnt < 9) ? vol_10 + volume : vol_10
+    vol_30 := is_market_sesion ? volume : (bar_cnt < 29) ? vol_30 + volume : vol_30
+    vol_45 := is_market_sesion ? volume : (bar_cnt < 44) ? vol_45 + volume : vol_45
+    vol_ses := is_new_sesion ? volume : is_session ? vol_ses + volume : vol_ses
+    
+    
+    // Counter for each bar after session open
+    bar_cnt := is_market_sesion ? 0 : session.ismarket ? bar_cnt + 1 : bar_cnt
+     
+     
+    // add to array if condition = true
+    if (bar_cnt == 0)
+        f_add_to_array(vol_arr_1, vol_1)
+    if (bar_cnt == 4)
+        f_add_to_array(vol_arr_5, vol_5)
+    if (bar_cnt == 9)
+        f_add_to_array(vol_arr_10, vol_10)
+    if (bar_cnt == 29)
+        f_add_to_array(vol_arr_30, vol_30)
+    if (bar_cnt == 44)
+        f_add_to_array(vol_arr_45, vol_45)
+    if(is_session_end == true)    
+        f_add_to_array(vol_arr_ses, vol_ses)
+    
+    
+    total_volume_1 = array.sum(vol_arr_1)
+    avg_volume_1 = array.avg(vol_arr_1)
+    
+    total_volume_5 = array.sum(vol_arr_5)
+    avg_volume_5 = array.avg(vol_arr_5)
+    
+    total_volume_10 = array.sum(vol_arr_10)
+    avg_volume_10 = array.avg(vol_arr_10)
+    
+    total_volume_30 = array.sum(vol_arr_30)
+    avg_volume_30 = array.avg(vol_arr_30)
+    
+    total_volume_45 = array.sum(vol_arr_45)
+    avg_volume_45 = array.avg(vol_arr_45)
+    
+    
+    avg_volume_ses = array.avg(vol_arr_ses)
+    
+     
+    var string GP2 = "Table Style"
+    i_tbl_bg_color = input.color(defval=color.rgb(149, 152, 161, 0), title="  Table Background Color", group=GP2) //  rgb(149,152,161) 
+    i_tbl_border_color = input.color(defval=color.rgb(30, 39, 46, 0), title="  Table Border Color", group=GP2) // Black Pearl= rgb(30, 39, 46)
+    i_tbl_text_color = input.color(defval=color.rgb(241, 242, 246, 0), title="  Table Text Color", group=GP2) // Anti-Flash White = rgb(241, 242, 246)
+    i_tbl_frame_width = input.int(defval=2, title="  Table Frame Width", minval=1, maxval=20, group=GP2)
+    i_tbl_border_width = input.int(defval=1, title="  Table Border Width", minval=1, maxval=20, group=GP2)
+     
+    string  i_tableYpos = input.string(defval="top", title=" Table Position", inline="11", options=["top", "middle", "bottom"], group=GP2)
+    string  i_tableXpos = input.string(defval="center", title="", inline="11", options=["left", "center", "right"], group=GP2)
+     
+     
+    // Display table only on last bar to reduce computation time
+    if barstate.islast
+     
+        // Only Display table on daily chart or a lower timeframe
+        if timeframe.isminutes and timeframe.multiplier < 31
+            // Create a table with 3 columns and 2 rows
+            var table volTable = table.new(i_tableYpos + "_" + i_tableXpos, 6, 7, bgcolor = i_tbl_bg_color, frame_width = i_tbl_frame_width, frame_color = i_tbl_border_color, border_width = i_tbl_border_width, border_color = i_tbl_border_color)
+            // Populate cells in table
+     
+            // Column 1
+            table.cell(volTable, 0, 0, "V%: " + str.tostring(math.round(vol_pm / avg_volume_ses * 100)) + "%", text_halign=text.align_left)
+            // table.cell(volTable, 0, 1, text="V. (AVG)", text_halign=text.align_left)
+            // table.cell(volTable, 0, 2, text="V. (Today)", text_halign=text.align_left)
+            table.cell(volTable, 0, 3, text="V. (Today %)", text_halign=text.align_left)
+            // Column 1
+            table.cell(volTable, 1, 0, text="1m")
+            // table.cell(volTable, 1, 1, str.tostring(avg_volume_1, format.volume))
+            // table.cell(volTable, 1, 2, str.tostring(vol_1, format.volume))
+            table.cell(volTable, 1, 3, str.tostring(math.round(vol_1 / avg_volume_1 * 100,0)) + "%")
+            //
+            table.cell(volTable, 2, 0, text="5m")
+            // table.cell(volTable, 2, 1, str.tostring(avg_volume_5, format.volume))
+            // table.cell(volTable, 2, 2, str.tostring(vol_5, format.volume))
+            table.cell(volTable, 2, 3, str.tostring(math.round(vol_5 / avg_volume_5 * 100,0)) + "%")
+            //
+            table.cell(volTable, 3, 0, text="10m")
+            // table.cell(volTable, 3, 1, str.tostring(avg_volume_10, format.volume))
+            // table.cell(volTable, 3, 2, str.tostring(vol_10, format.volume))
+            table.cell(volTable, 3, 3, str.tostring(math.round(vol_10 / avg_volume_10 * 100,0)) + "%")
+            //
+            table.cell(volTable, 4, 0, text="30m")
+            // table.cell(volTable, 4, 1, str.tostring(avg_volume_30, format.volume))
+            // table.cell(volTable, 4, 2, str.tostring(vol_30, format.volume))
+            table.cell(volTable, 4, 3, str.tostring(math.round(vol_30 / avg_volume_30 * 100,0)) + "%")
+             //
+            table.cell(volTable, 5, 0, text="45m")
+            // table.cell(volTable, 5, 1, str.tostring(avg_volume_45, format.volume))
+            // table.cell(volTable, 5, 2, str.tostring(vol_45, format.volume))
+            table.cell(volTable, 5, 3, str.tostring(math.round(vol_45 / avg_volume_45 * 100,0)) + "%")
+    
+    
 
 </body>
 </html>
