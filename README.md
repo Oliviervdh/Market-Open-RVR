@@ -16,3 +16,6 @@ Step 7) Adding the indicator to your chart >> Click the "indicator" tab (top of 
 
 Step 8) Enjoy! ;) 
 
+FYI >> Indicator calculations are per candle, not time unit. Meaning the indicator current table data is only accurate in the M1 chart. 
+       If you are in a higher timeframe e.g. the M5 chart then the values in table cell ((1m = relative volume off the 1st 5min candle)(5m = relative volume of the first five 5min candles) and so on ...)(Future versions will have a dynamic table).
+
