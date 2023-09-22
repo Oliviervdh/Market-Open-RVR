@@ -1,5 +1,7 @@
 # Market-Open-RVR
 
+Discription >> The Indikator calculates the Pre Market Volume %, relative to the Avg Volume being traded in the trading session (14 Day) >> The Indikator Calculates the relative Volume per time unit, displayed in a table. Relative Volume between 250% & 350% has a orange background color. Relative Volume above 350% has a green background. 
+
 Step 1) Open the File "marketopenrvr.html"
 
 Step 2) Copying the code which is in the "body" of the file >> DO NOT copy THE MARKUP of the HTML file!!! Start copying the code wich starts on Line 11 and ends on Line 182. :)
