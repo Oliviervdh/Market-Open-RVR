@@ -1,11 +1,11 @@
 # Market-Open-RVR
 
-Discription >> The Indikator calculates the Pre Market Volume % of the current day, relative to the Avg Volume being traded in the trading session (14 Days) (Displayed in table row 1, Table cell 1 as V%) Pre market Volume% between 15 & 30% has a orange background color. Pre Market Volume% above 30% has a green background color.
->> The Indikator Calculates the relative Volume per time unit, displayed in a table. Relative Volume between 250% & 350% has a orange background color. Relative Volume above 350% has a green background color. 
+Discription >> The Indikator calculates the Pre Market Volume % of the current day, relative to the Avg Volume being traded in the trading session (14 Days) (Displayed in Table Row 1, Table Cell 1 as V%) Pre Market Volume% between 15% & 30% has a orange background color. Pre Market Volume% above 30% has a green background color.
+>> The Indikator Calculates the relative Volume per canlde (e.g "1M","2M" up to "5M"), displayed in a table. Relative Volume between 250% & 350% has a orange background color. Relative Volume above 350% has a green background color. 
 
 Step 1) Open the File "marketopenrvr.html"
 
-Step 2) Copying the code which is in the "body" of the file >> DO NOT copy THE MARKUP of the HTML file!!! Start copying the code wich starts on Line 11 and ends on Line 182. :)
+Step 2) Copying the code which is in the "body" of the file >> DO NOT copy THE MARKUP of the HTML file!!! Start copying the code which starts on Line 11 and ends on Line 182. :)
 
 Step 3) Open Tradingview.
 
@@ -15,7 +15,7 @@ Step 5) Creating New indicator >>  Click on "Open" (right side of the screen) an
 
 Step 6) Pasting the code in the Pine Editor >> Paste the code in the newly created indicator and click on "Safe" (right side of the screen, next to "Open").
 
-Step 7) Adding the indicator to your chart >> Click the "indicator" tab (top of the screen) to add a new indicator >> Click on my script >> type in name of indicator "Market Open RVR" >> Add to Favorites >> Add to chart.
+Step 7) Adding the indicator to your chart >> Click the "indicator" tab (top of the screen) to add a new indicator >> Click on my scripts >> type in name of indicator "Market Open RVR" >> Add to Favorites >> Add to chart.
 
 Step 8) Enjoy! ;) 
 
