@@ -1,7 +1,7 @@
 # Market-Open-RVR
+Discription >>The indicator calculates the Pre-market volume percentage of the current day, relative to the average volume being traded in the trading session (14 days), displayed in Table Row 1, Table Cell 1, as V%. Pre-market volume between 15% & 30% has a orange background color. Pre-market volume percentage above 30% has a green background color.
 
-Discription >> The Indikator calculates the Pre Market Volume % of the current day, relative to the Avg Volume being traded in the trading session (14 Days) Displayed in Table Row 1, Table Cell 1 as V%. Pre Market Volume% between 15% & 30% has a orange background color. Pre Market Volume% above 30% has a green background color.
->> The Indikator Calculates the relative Volume per canlde, relative to the Avg Volume being traded in that time period (14 Days) (e.g "1M","2M" up to "5M"), displayed in a table. Relative Volume between 250% & 350% has a orange background color. Relative Volume above 350% has a green background color. 
+>> The indicator calculates the relative volume per candle relative to the average volume being traded in that time period (14 days) (e.g., "1M," "2M," up to "5M"), displayed in a table. Relative volume between 250% & 350% has an orange background color. Relative volume above 350% has a green background color.
 
 Step 1) Open the File "marketopenrvr.html"
 
@@ -19,6 +19,5 @@ Step 7) Adding the indicator to your chart >> Click the "indicator" tab (top of 
 
 Step 8) Enjoy! ;) 
 
-FYI >> Indicator calculations are per candle, not time unit. Meaning the indicator current table data is only accurate in the M1 chart. 
-       If you are using the indicator in a higher timeframe e.g. the M5 chart, then the values in table cells >> ((1m == relative volume off the 1st 1min candle)(5m == relative volume of the first five 5min candle) and so on ...)(Future versions will have a dynamic table).
-
+FYI >> Indicator calculations are per candle, not time unit. Meaning, the indicator current table data is only accurate in the M1 chart. 
+       If you are using the indicator in a higher timeframe, e.g., the M5 chart, then the values in table cells >> ((1M == relative volume of the 1st 1 minute candle); (5M = relative volume of the first  5 minute candle); and so on. (Future versions will have a dynamic table).
