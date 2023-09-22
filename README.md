@@ -2,7 +2,7 @@
 
 Step 1) Open the File "marketopenrvr.html"
 
-Step 2) Copying the code which is in the "body" of the file >> DO NOT copy THE MARKUP of the HTML file!!! Start copying the code wich starts on Line 11 and ends on Line 175. :)
+Step 2) Copying the code which is in the "body" of the file >> DO NOT copy THE MARKUP of the HTML file!!! Start copying the code wich starts on Line 11 and ends on Line 182. :)
 
 Step 3) Open Tradingview.
 
